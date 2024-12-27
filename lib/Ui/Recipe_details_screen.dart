@@ -1,10 +1,21 @@
+import 'dart:io';
+
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
-  const RecipeDetailsScreen({super.key});
+  final String title;
+  final String image;
+  final String Incriedient;
+  final String description;
+  const RecipeDetailsScreen(
+      {super.key,
+      required this.title,
+      required this.image,
+      required this.Incriedient,
+      required this.description});
 
   @override
   State<RecipeDetailsScreen> createState() => _RecipeDetailsScreenState();
@@ -35,11 +46,16 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                 width: double.infinity.w,
                 height: 200.h,
                 decoration: ShapeDecoration(
+                    image: DecorationImage(
+                      image: FileImage(File(widget.image)),
+                      fit: BoxFit.cover,
+                    ),
                     color: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.r),
                     ))),
-            Row(mainAxisAlignment: MainAxisAlignment.end,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
                   width: 50.w,
@@ -68,7 +84,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               ],
             ),
             Text(
-              'Healthy Taco Salad ',
+              widget.title,
               style: GoogleFonts.sofiaSans(
                 color: Color(0xFF0A2533),
                 fontSize: 24.sp,
@@ -76,26 +92,25 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                 height: 1.35,
               ),
             ),
-           
             SizedBox(
               height: 8.h,
             ),
-            Container(height: 30.h,
+            Container(
+              height: 30.h,
               child: ListView.builder(
-                itemCount:6,
+                itemCount: 6,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index1) {
                   return Padding(
-                    padding:EdgeInsets.only(right: 5.w),
-                    child: Container(padding: EdgeInsets.only(right: 10.w,left: 10.w),
+                    padding: EdgeInsets.only(right: 5.w),
+                    child: Container(
+                      padding: EdgeInsets.only(right: 10.w, left: 10.w),
                       height: 25.h,
-                         
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15.r),
-                          color:Color(0xFF6FB9BE)),
+                          color: Color(0xFF6FB9BE)),
                       child: Center(
-                        child: Text(
-                            'egg - 2',
+                        child: Text('egg - 2',
                             style: GoogleFonts.mulish(
                                 color: Colors.white,
                                 fontSize: 15.sp,
@@ -106,7 +121,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                 },
               ),
             ),
-             SizedBox(
+            SizedBox(
               height: 10.h,
             ),
             Text(

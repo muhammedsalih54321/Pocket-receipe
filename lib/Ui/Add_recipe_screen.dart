@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pocket_recipes/Provider/Receipe_model.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -11,9 +16,30 @@ class AddRecipeScreen extends StatefulWidget {
 }
 
 class _AddRecipeScreenState extends State<AddRecipeScreen> {
+  late Box<Recipe> recipeBox;
+
+  @override
+  void initState() {
+    super.initState();
+    recipeBox = Hive.box<Recipe>('recipes'); // Open the box (it's already opened in main.dart)
+  }
+
   final Title = TextEditingController();
   final incrediant = TextEditingController();
   final description = TextEditingController();
+  final Picker = ImagePicker();
+  File? image;
+
+  Future<void> getimage() async {
+    final PickedFile = await Picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    setState(() {
+      if (PickedFile != null) {
+        image = File(PickedFile.path);
+      } else {
+        print('No image selected');
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +69,34 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              Container(
+                width: double.infinity,
+                height: 200.h,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xFFA8A8A9)),
+                  borderRadius: BorderRadius.circular(18.r),
+                  image: image != null
+                      ? DecorationImage(
+                          image: FileImage(image!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: image == null
+                    ? GestureDetector(
+                        onTap: getimage,
+                        child: Center(
+                          child: Icon(
+                            BootstrapIcons.image,
+                            size: 80.sp,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
               Row(
                 children: [
                   Text(
@@ -88,8 +142,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20.h,),
-               Row(
+              SizedBox(
+                height: 20.h,
+              ),
+              Row(
                 children: [
                   Text(
                     'Incriedient',
@@ -101,8 +157,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ],
               ),
-              TextFormField(maxLines: 20,
-              minLines: 2,
+              TextFormField(
+                maxLines: 20,
+                minLines: 2,
                 controller: incrediant,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
@@ -135,8 +192,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20.h,),
-               Row(
+              SizedBox(
+                height: 20.h,
+              ),
+              Row(
                 children: [
                   Text(
                     'Description',
@@ -148,8 +207,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ],
               ),
-              TextFormField(maxLines: 50,
-              minLines: 10,
+              TextFormField(
+                maxLines: 50,
+                minLines: 10,
                 controller: description,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
@@ -182,6 +242,74 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   return null;
                 },
               ),
+              SizedBox(
+                height: 20.h,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  if (Title.text.isEmpty ||
+                      incrediant.text.isEmpty ||
+                      description.text.isEmpty ||
+                      image == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text("Please fill all fields and select an image!")),
+                    );
+                    return;
+                  }
+
+                  // Save to Hive
+                  final recipe = Recipe(
+                    title: Title.text,
+                    ingredients: incrediant.text,
+                    description: description.text,
+                    imagePath: image!.path,
+                  );
+
+                  await recipeBox.add(recipe);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Recipe added successfully!")),
+                  );
+
+                  // Clear fields and image
+                  setState(() {
+                    Title.clear();
+                    incrediant.clear();
+                    description.clear();
+                    image = null;
+                    Navigator.pop(context);
+                  });
+                },
+                child: Container(
+                    width: 316.w,
+                    height: 57.h,
+                    padding: const EdgeInsets.symmetric(vertical: 17),
+                    decoration: ShapeDecoration(
+                      color: Color(0xFF6FB9BE),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
+                    ),
+                    child: Center(
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                          Text(
+                            'Create',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                              height: 0,
+                              letterSpacing: 0.36,
+                            ),
+                          )
+                        ]))),
+              ),
+              SizedBox(
+                height: 20.h,
+              )
             ],
           ),
         ),
