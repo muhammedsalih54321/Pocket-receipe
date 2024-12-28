@@ -6,6 +6,7 @@ import 'package:pocket_recipes/Provider/Receipe_model.dart';
 import 'package:pocket_recipes/Ui/splash_screen.dart';
 
 
+
 void main() async {
  WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();

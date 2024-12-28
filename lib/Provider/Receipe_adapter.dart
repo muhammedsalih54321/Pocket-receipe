@@ -22,7 +22,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
   Recipe read(BinaryReader reader) {
     return Recipe(
       title: reader.readString(),
-      ingredients: reader.readString(),
+      ingredients: reader.readList(),
       description: reader.readString(),
       imagePath: reader.readString(),
     );
@@ -31,7 +31,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
   @override
   void write(BinaryWriter writer, Recipe obj) {
     writer.writeString(obj.title);
-    writer.writeString(obj.ingredients);
+    writer.writeList(obj.ingredients);
     writer.writeString(obj.description);
     writer.writeString(obj.imagePath);
   }

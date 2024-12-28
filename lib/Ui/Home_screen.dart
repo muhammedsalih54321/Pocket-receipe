@@ -9,6 +9,7 @@ import 'package:pocket_recipes/Provider/Receipe_model.dart';
 import 'package:pocket_recipes/Ui/Add_recipe_screen.dart';
 import 'package:pocket_recipes/Ui/Recipe_details_screen.dart';
 import 'package:pocket_recipes/Ui/favourate_page.dart';
+import 'package:pocket_recipes/widget/custom_page_route.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +21,31 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final Box<Recipe> recipeBox = Hive.box<Recipe>('recipes');
+  List<Recipe> filteredRecipes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize filtered list with all recipes
+    filteredRecipes = recipeBox.values.toList();
+    _searchController.addListener(_searchRecipes);
+  }
+
+  void _searchRecipes() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredRecipes = recipeBox.values
+          .where((recipe) => recipe.title.toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_searchRecipes);
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
           'Pocket Recipes ',
           textAlign: TextAlign.left,
           style: GoogleFonts.sofiaSans(
-            color: Color.fromRGBO(10, 37, 51, 1),
+            color: const Color.fromRGBO(10, 37, 51, 1),
             fontSize: 24.sp,
-            letterSpacing: 0,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -42,10 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.only(right: 20.w),
             child: InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => FavouratePage()));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => FavouratePage()));
               },
-              child: Icon(
+              child: const Icon(
                 BootstrapIcons.heart,
                 color: Colors.black,
               ),
@@ -64,15 +89,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: ShapeDecoration(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 2.w, color: Color(0xFFE6EBF2)),
+                    side: BorderSide(width: 2.w, color: const Color(0xFFE6EBF2)),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
                 child: TextFormField(
                   style: GoogleFonts.sofiaSans(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black),
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                  ),
                   controller: _searchController,
                   decoration: InputDecoration(
                     prefixIcon: Icon(
@@ -81,22 +107,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     hintText: 'Search',
                     hintStyle: GoogleFonts.sofiaSans(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF97A1B0)),
-                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF97A1B0),
+                    ),
+                    border: const OutlineInputBorder(borderSide: BorderSide.none),
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              height: 10.h,
-            ),
+            SizedBox(height: 10.h),
             Expanded(
               child: ValueListenableBuilder(
                 valueListenable: recipeBox.listenable(),
                 builder: (context, Box<Recipe> box, _) {
-                  if (box.isEmpty) {
+                  // Update filteredRecipes whenever box changes
+                  filteredRecipes = _searchController.text.isEmpty
+                      ? box.values.toList()
+                      : box.values
+                          .where((recipe) => recipe.title
+                              .toLowerCase()
+                              .contains(_searchController.text.toLowerCase()))
+                          .toList();
+
+                  if (filteredRecipes.isEmpty) {
                     return Center(
                       child: Text(
                         'No Recipes Found',
@@ -108,46 +142,38 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   }
-
                   return ListView.builder(
-                    itemCount: box.length,
+                    itemCount: filteredRecipes.length,
                     itemBuilder: (context, index) {
-                      final recipe = box.getAt(index);
+                      final recipe = filteredRecipes[index];
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 5.h),
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => RecipeDetailsScreen(
-                                  title: recipe!.title,
+                              Navigator.of(context).push(CustomPageRoute(child: RecipeDetailsScreen(
+                                  title: recipe.title,
                                   image: recipe.imagePath,
                                   Incriedient: recipe.ingredients,
                                   description: recipe.description,
-                                ),
-                              ),
-                            );
+                                ),direction: AxisDirection.up));
+                         
                           },
                           child: Container(
-                            padding: EdgeInsets.only(
-                                right: 16.w, left: 8.w, top: 8.h, bottom: 8.h),
-                            width: 327.w,
-                            height: 100.h,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.w, vertical: 8.h),
                             decoration: ShapeDecoration(
                               color: Colors.white,
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
+                                side: const BorderSide(
                                     width: 1, color: Color(0xFFFAFAFA)),
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              shadows: [
+                              shadows: const [
                                 BoxShadow(
                                   color: Color(0x19053336),
                                   blurRadius: 16,
                                   offset: Offset(0, 2),
-                                  spreadRadius: 0,
-                                )
+                                ),
                               ],
                             ),
                             child: Row(
@@ -156,45 +182,42 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 100.w,
                                   height: 84.h,
                                   decoration: ShapeDecoration(
-                                    image: recipe?.imagePath != null
+                                    // ignore: unnecessary_null_comparison
+                                    image: recipe.imagePath != null
                                         ? DecorationImage(
                                             image: FileImage(
-                                                File(recipe!.imagePath)),
+                                                File(recipe.imagePath)),
                                             fit: BoxFit.cover,
                                           )
                                         : null,
-                                    color: Color(0xFF88C3C6),
+                                    color: const Color(0xFF88C3C6),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16.r),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 16.w,
-                                ),
+                                SizedBox(width: 16.w),
                                 Expanded(
                                   child: Text(
-                                    recipe?.title ?? 'No Title',
+                                    recipe.title,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.sofiaSans(
-                                      color: Color(0xFF0A2533),
+                                      color: const Color(0xFF0A2533),
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 8.w,
-                                ),
+                                SizedBox(width: 8.w),
                                 Container(
                                   width: 24.w,
                                   height: 24.h,
                                   decoration: ShapeDecoration(
-                                    color: Color(0xFF032628),
+                                    color: const Color(0xFF032628),
                                     shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.r)),
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
                                   ),
                                   child: Center(
                                     child: Icon(
@@ -219,11 +242,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (_) => AddRecipeScreen()));
+          Navigator.of(context).push(CustomPageRoute(child: AddRecipeScreen(),direction: AxisDirection.right));
+          
         },
         child: const Icon(Icons.add, color: Colors.white),
-        backgroundColor: Color(0xFF6FB9BE),
+        backgroundColor: const Color(0xFF6FB9BE),
       ),
     );
   }

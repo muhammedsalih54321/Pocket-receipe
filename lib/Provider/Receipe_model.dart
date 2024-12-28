@@ -7,7 +7,7 @@ class Recipe {
   final String title;
 
   @HiveField(1)
-  final String ingredients;
+  final List ingredients;
 
   @HiveField(2)
   final String description;

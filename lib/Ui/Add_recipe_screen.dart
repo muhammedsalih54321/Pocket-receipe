@@ -21,7 +21,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   @override
   void initState() {
     super.initState();
-    recipeBox = Hive.box<Recipe>('recipes'); // Open the box (it's already opened in main.dart)
+    recipeBox = Hive.box<Recipe>(
+        'recipes'); // Open the box (it's already opened in main.dart)
   }
 
   final Title = TextEditingController();
@@ -31,7 +32,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   File? image;
 
   Future<void> getimage() async {
-    final PickedFile = await Picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final PickedFile =
+        await Picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     setState(() {
       if (PickedFile != null) {
         image = File(PickedFile.path);
@@ -40,6 +42,18 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       }
     });
   }
+
+  final List<String> _ingredients = [];
+
+  void _addIngredient() {
+    if (incrediant.text.trim().isNotEmpty) {
+      setState(() {
+        _ingredients.add(incrediant.text.trim());
+        incrediant.clear();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,11 +172,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ],
               ),
               TextFormField(
-                maxLines: 20,
-                minLines: 2,
                 controller: incrediant,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: _addIngredient,
+                  ),
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
@@ -185,11 +201,36 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     height: 0.10,
                   ),
                 ),
+                onFieldSubmitted: (value) => _addIngredient(),
                 validator: (Incriedient) {
                   if (Incriedient!.isEmpty) {
                     return 'Enter the Incriedients!';
                   }
                   return null;
+                },
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
+              ...List.generate(
+                _ingredients.length,
+                (index) {
+                  return  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Card(
+                      child: ListTile(
+                        title: Text(_ingredients[index]),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              _ingredients.removeAt(index);
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
               SizedBox(
@@ -248,12 +289,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               GestureDetector(
                 onTap: () async {
                   if (Title.text.isEmpty ||
-                      incrediant.text.isEmpty ||
+                      _ingredients.isEmpty ||
                       description.text.isEmpty ||
                       image == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text("Please fill all fields and select an image!")),
+                          content: Text(
+                              "Please fill all fields and select an image!")),
                     );
                     return;
                   }
@@ -261,7 +303,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   // Save to Hive
                   final recipe = Recipe(
                     title: Title.text,
-                    ingredients: incrediant.text,
+                    ingredients: _ingredients,
                     description: description.text,
                     imagePath: image!.path,
                   );

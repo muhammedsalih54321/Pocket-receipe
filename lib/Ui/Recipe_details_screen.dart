@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 class RecipeDetailsScreen extends StatefulWidget {
   final String title;
   final String image;
-  final String Incriedient;
+  final List<dynamic> Incriedient;
   final String description;
   const RecipeDetailsScreen(
       {super.key,
@@ -42,46 +42,50 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-                width: double.infinity.w,
-                height: 200.h,
-                decoration: ShapeDecoration(
-                    image: DecorationImage(
-                      image: FileImage(File(widget.image)),
-                      fit: BoxFit.cover,
-                    ),
-                    color: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.r),
-                    ))),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  width: 50.w,
-                  height: 50.h,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    shadows: [
-                      BoxShadow(
-                        color: Color(0x19053336),
-                        blurRadius: 16.r,
-                        offset: Offset(0, 2),
-                        spreadRadius: 1,
-                      )
-                    ],
+            Container(padding: EdgeInsets.all(12),
+              width: double.infinity.w,
+              height: 200.h,
+              decoration: ShapeDecoration(
+                  image: DecorationImage(
+                    image: FileImage(File(widget.image)),
+                    fit: BoxFit.cover,
                   ),
-                  child: Center(
-                    child: Icon(
-                      BootstrapIcons.heart,
-                      color: Colors.black,
+                  color: Color(0xFF0A2533),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.r),
+                  )),
+              child: Row(mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 50.w,
+                    height: 50.h,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      shadows: [
+                        BoxShadow(
+                          color: Color(0x19053336),
+                          blurRadius: 16.r,
+                          offset: Offset(0, 2),
+                          spreadRadius: 1,
+                        )
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(
+                        BootstrapIcons.heart,
+                        color: Color(0xFF0A2533),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 20.h,
             ),
             Text(
               widget.title,
@@ -96,36 +100,34 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               height: 8.h,
             ),
             Container(
-              height: 30.h,
-              child: ListView.builder(
-                itemCount: 6,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index1) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: 5.w),
-                    child: Container(
-                      padding: EdgeInsets.only(right: 10.w, left: 10.w),
-                      height: 25.h,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          color: Color(0xFF6FB9BE)),
-                      child: Center(
-                        child: Text('egg - 2',
-                            style: GoogleFonts.mulish(
-                                color: Colors.white,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w700)),
+              child: Wrap(
+                spacing: 5.w, // Horizontal spacing between items
+                runSpacing: 10.h, // Vertical spacing between rows
+                children: widget.Incriedient.map((item) {
+                  return Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6.r),
+                      color: Color(0xFFE6EBF2),
+                    ),
+                    child: Text(
+                      item.toString(),
+                      style: GoogleFonts.mulish(
+                        color: Color(0xFF0A2533),
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   );
-                },
+                }).toList(),
               ),
             ),
             SizedBox(
               height: 10.h,
             ),
             Text(
-              'This Healthy Taco Salad is the universal delight of taco night Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source',
+              widget.description,
               style: GoogleFonts.sofiaSans(
                 color: Color(0xFF738189),
                 fontSize: 16.sp,
