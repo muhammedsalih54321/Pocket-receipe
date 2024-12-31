@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -153,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.of(context).push(CustomPageRoute(child: RecipeDetailsScreen(
                                   title: recipe.title,
                                   image: recipe.imagePath,
-                                  Incriedient: recipe.ingredients,
+                                  ingredients: recipe.ingredients,
                                   description: recipe.description,
                                 ),direction: AxisDirection.up));
                          

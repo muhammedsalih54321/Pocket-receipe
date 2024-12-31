@@ -1,141 +1,188 @@
 import 'dart:io';
 
-import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bootstrap_icons/bootstrap_icons.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
   final String title;
   final String image;
-  final List<dynamic> Incriedient;
+  final List<dynamic> ingredients;
   final String description;
-  const RecipeDetailsScreen(
-      {super.key,
-      required this.title,
-      required this.image,
-      required this.Incriedient,
-      required this.description});
+
+  const RecipeDetailsScreen({
+    Key? key,
+    required this.title,
+    required this.image,
+    required this.ingredients,
+    required this.description,
+  }) : super(key: key);
 
   @override
   State<RecipeDetailsScreen> createState() => _RecipeDetailsScreenState();
 }
 
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
+  late Box<Map<String, dynamic>> favoriteBox;
+  bool isFavorite = false;
+
+ @override
+void initState() {
+  super.initState();
+
+  // Access the already opened box
+  favoriteBox = Hive.box<Map<String, dynamic>>('favorite');
+  isFavorite = favoriteBox.containsKey(widget.title);
+}
+
+
+  void checkIfFavorite() {
+    setState(() {
+      isFavorite = favoriteBox.containsKey(widget.title);
+    });
+  }
+
+ void toggleFavorite() {
+  if (isFavorite) {
+    // Remove from favorites
+    favoriteBox.delete(widget.title);
+  } else {
+    // Add to favorites with proper type
+    favoriteBox.put(widget.title, {
+      'title': widget.title,
+      'image': widget.image,
+      'ingredients': widget.ingredients,
+      'description': widget.description,
+    });
+  }
+  setState(() {
+    isFavorite = !isFavorite;
+  });
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            BootstrapIcons.chevron_left,
-            color: Colors.black,
-          ),
-        ),
-      ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(padding: EdgeInsets.all(12),
-              width: double.infinity.w,
-              height: 200.h,
-              decoration: ShapeDecoration(
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20.h),
+              Container(
+                padding: EdgeInsets.all(12),
+                width: double.infinity,
+                height: 230.h,
+                decoration: BoxDecoration(
                   image: DecorationImage(
                     image: FileImage(File(widget.image)),
                     fit: BoxFit.cover,
                   ),
-                  color: Color(0xFF0A2533),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.r),
-                  )),
-              child: Row(mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 50.w,
-                    height: 50.h,
-                    decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      shadows: [
-                        BoxShadow(
-                          color: Color(0x19053336),
-                          blurRadius: 16.r,
-                          offset: Offset(0, 2),
-                          spreadRadius: 1,
-                        )
+                  borderRadius: BorderRadius.circular(18.r),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            width: 40.w,
+                            height: 40.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 6.r,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              BootstrapIcons.x_lg,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: toggleFavorite,
+                          child: Container(
+                            width: 40.w,
+                            height: 40.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 6.r,
+                                ),
+                              ],
+                            ),
+                            child:isFavorite ? Icon(
+                              BootstrapIcons.heart_fill,
+                              color:Color(0xFF6FB9BE),
+                            ):Icon(
+                              BootstrapIcons.heart,
+                              color:Colors.black87,
+                            )
+                          ),
+                        ),
                       ],
                     ),
-                    child: Center(
-                      child: Icon(
-                        BootstrapIcons.heart,
-                        color: Color(0xFF0A2533),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SizedBox(
-              height: 20.h,
-            ),
-            Text(
-              widget.title,
-              style: GoogleFonts.sofiaSans(
-                color: Color(0xFF0A2533),
-                fontSize: 24.sp,
-                fontWeight: FontWeight.w800,
-                height: 1.35,
+              SizedBox(height: 20.h),
+              Text(
+                widget.title,
+                style: GoogleFonts.sofiaSans(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
-            ),
-            SizedBox(
-              height: 8.h,
-            ),
-            Container(
-              child: Wrap(
-                spacing: 5.w, // Horizontal spacing between items
-                runSpacing: 10.h, // Vertical spacing between rows
-                children: widget.Incriedient.map((item) {
+              SizedBox(height: 10.h),
+              Wrap(
+                spacing: 5.w,
+                runSpacing: 10.h,
+                children: widget.ingredients.map((ingredient) {
                   return Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 5.h,
+                    ),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6.r),
-                      color: Color(0xFFE6EBF2),
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
-                      item.toString(),
+                      ingredient,
                       style: GoogleFonts.mulish(
-                        color: Color(0xFF0A2533),
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 14.sp,
+                        color: Colors.black87,
                       ),
                     ),
                   );
                 }).toList(),
               ),
-            ),
-            SizedBox(
-              height: 10.h,
-            ),
-            Text(
-              widget.description,
-              style: GoogleFonts.sofiaSans(
-                color: Color(0xFF738189),
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w400,
-                height: 1.45,
+              SizedBox(height: 20.h),
+              Text(
+                widget.description,
+                style: GoogleFonts.sofiaSans(
+                  fontSize: 16.sp,
+                  color: Colors.grey[700],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

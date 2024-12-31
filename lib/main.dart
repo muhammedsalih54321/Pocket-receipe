@@ -15,6 +15,8 @@ void main() async {
   Hive.registerAdapter(RecipeAdapter());
   // Open the box where your recipes are stored
   await Hive.openBox<Recipe>('recipes');
+await Hive.openBox<Map<String, dynamic>>('favorite');
+
 
   runApp(MyApp());
 
