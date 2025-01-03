@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pocket_recipes/Provider/Receipe_model.dart';
+import 'package:pocket_recipes/Provider/Recipe_provider.dart';
+import 'package:provider/provider.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -21,41 +22,57 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   @override
   void initState() {
     super.initState();
-    recipeBox = Hive.box<Recipe>(
-        'recipes'); // Open the box (it's already opened in main.dart)
+    recipeBox = Hive.box<Recipe>('recipes'); // Open the box
   }
 
-  final Title = TextEditingController();
-  final incrediant = TextEditingController();
-  final description = TextEditingController();
-  final Picker = ImagePicker();
-  File? image;
+  final _titleController = TextEditingController();
+  final _ingredientController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  File? _image;
+  final List<String> _ingredients = [];
 
-  Future<void> getimage() async {
-    final PickedFile =
-        await Picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+  Future<void> _getImage() async {
+    final pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     setState(() {
-      if (PickedFile != null) {
-        image = File(PickedFile.path);
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
       } else {
-        print('No image selected');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No image selected')),
+        );
       }
     });
   }
 
-  final List<String> _ingredients = [];
-
   void _addIngredient() {
-    if (incrediant.text.trim().isNotEmpty) {
+    final ingredient = _ingredientController.text.trim();
+    if (ingredient.isNotEmpty && !_ingredients.contains(ingredient)) {
       setState(() {
-        _ingredients.add(incrediant.text.trim());
-        incrediant.clear();
+        _ingredients.add(ingredient);
+        _ingredientController.clear();
       });
+    } else if (ingredient.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an ingredient!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingredient already added!')),
+      );
     }
+  }
+
+  void _clearImage() {
+    setState(() {
+      _image = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -70,7 +87,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           ),
         ),
         title: Text(
-          'Add reciepe',
+          'Add Recipe',
           style: GoogleFonts.sofiaSans(
             color: Color(0xFF0A2533),
             fontSize: 25.sp,
@@ -89,28 +106,26 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Color(0xFFA8A8A9)),
                   borderRadius: BorderRadius.circular(18.r),
-                  image: image != null
+                  image: _image != null
                       ? DecorationImage(
-                          image: FileImage(image!),
+                          image: FileImage(_image!),
                           fit: BoxFit.cover,
                         )
                       : null,
                 ),
-                child: image == null
-                    ? GestureDetector(
-                        onTap: getimage,
-                        child: Center(
-                          child: Icon(
-                            BootstrapIcons.image,
-                            size: 80.sp,
-                          ),
+                child: _image == null
+                    ? Center(
+                        child: IconButton(
+                          icon: Icon(BootstrapIcons.image, size: 80.sp),
+                          onPressed: _getImage,
                         ),
                       )
-                    : null,
+                    : IconButton(
+                        icon: Icon(Icons.clear, size: 30.sp),
+                        onPressed: _clearImage,
+                      ),
               ),
-              SizedBox(
-                height: 20.h,
-              ),
+              SizedBox(height: 20.h),
               Row(
                 children: [
                   Text(
@@ -124,45 +139,42 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ],
               ),
               TextFormField(
-                controller: Title,
+                controller: _titleController,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
                   enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
-                  hintText: 'Title  ',
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  hintText: 'Title',
                   hintStyle: GoogleFonts.poppins(
                     color: Color(0xFF7C7C7C),
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w400,
-                    height: 0.10,
                   ),
                 ),
-                validator: (Title) {
-                  if (Title!.isEmpty) {
+                validator: (value) {
+                  if (value!.isEmpty) {
                     return 'Enter the title!';
                   }
                   return null;
                 },
               ),
-              SizedBox(
-                height: 20.h,
-              ),
+              SizedBox(height: 20.h),
               Row(
                 children: [
                   Text(
-                    'Incriedient',
+                    'Ingredients',
                     style: GoogleFonts.sofiaSans(
                       color: Color(0xFF0A2533),
                       fontSize: 15.sp,
@@ -172,7 +184,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ],
               ),
               TextFormField(
-                controller: incrediant,
+                controller: _ingredientController,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
@@ -182,40 +194,31 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
                   enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
-                  hintText: 'Incriedients  ',
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  hintText: 'Ingredients',
                   hintStyle: GoogleFonts.poppins(
                     color: Color(0xFF7C7C7C),
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w400,
-                    height: 0.10,
                   ),
                 ),
                 onFieldSubmitted: (value) => _addIngredient(),
-                validator: (Incriedient) {
-                  if (Incriedient!.isEmpty) {
-                    return 'Enter the Incriedients!';
-                  }
-                  return null;
-                },
               ),
-              SizedBox(
-                height: 20.h,
-              ),
+              SizedBox(height: 20.h),
               ...List.generate(
                 _ingredients.length,
                 (index) {
-                  return  Padding(
+                  return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Card(
                       child: ListTile(
@@ -233,9 +236,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   );
                 },
               ),
-              SizedBox(
-                height: 20.h,
-              ),
+              SizedBox(height: 20.h),
               Row(
                 children: [
                   Text(
@@ -249,109 +250,100 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ],
               ),
               TextFormField(
-                maxLines: 50,
-                minLines: 10,
-                controller: description,
+                maxLines: 5,
+                minLines: 3,
+                controller: _descriptionController,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
                   enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                      borderRadius: BorderRadius.circular(10.r)),
-                  hintText: 'Description  ',
+                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  hintText: 'Description',
                   hintStyle: GoogleFonts.poppins(
                     color: Color(0xFF7C7C7C),
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w400,
-                    height: 0.10,
                   ),
                 ),
-                validator: (Description) {
-                  if (Description!.isEmpty) {
-                    return 'Enter the Description!';
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter the description!';
                   }
                   return null;
                 },
               ),
-              SizedBox(
-                height: 20.h,
-              ),
+              SizedBox(height: 20.h),
               GestureDetector(
                 onTap: () async {
-                  if (Title.text.isEmpty ||
+                  if (_titleController.text.isEmpty ||
                       _ingredients.isEmpty ||
-                      description.text.isEmpty ||
-                      image == null) {
+                      _descriptionController.text.isEmpty ||
+                      _image == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              "Please fill all fields and select an image!")),
+                      const SnackBar(
+                          content:
+                              Text("Please fill all fields and select an image!")),
                     );
                     return;
                   }
 
-                  // Save to Hive
-                  final recipe = Recipe(
-                    title: Title.text,
+                     final newRecipe = Recipe(
+                    title: _titleController.text,
+                    description: _descriptionController.text,
+                    imagePath: _image!.path, // Make sure to pass the path of the image
                     ingredients: _ingredients,
-                    description: description.text,
-                    imagePath: image!.path,
+                    isFavorite: false,
                   );
 
-                  await recipeBox.add(recipe);
-
+                  // Add recipe to provider
+                  await recipeProvider..addRecipe(newRecipe);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Recipe added successfully!")),
+                    const SnackBar(content: Text("Recipe added successfully!")),
                   );
 
-                  // Clear fields and image
+                  _titleController.clear();
+                  _ingredientController.clear();
+                  _descriptionController.clear();
                   setState(() {
-                    Title.clear();
-                    incrediant.clear();
-                    description.clear();
-                    image = null;
-                    Navigator.pop(context);
+                    _ingredients.clear();
+                    _image = null;
                   });
+                  Navigator.pop(context);
                 },
                 child: Container(
-                    width: 316.w,
-                    height: 57.h,
-                    padding: const EdgeInsets.symmetric(vertical: 17),
-                    decoration: ShapeDecoration(
-                      color: Color(0xFF6FB9BE),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.r),
+                  width: 316.w,
+                  height: 57.h,
+                  padding: const EdgeInsets.symmetric(vertical: 17),
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF6FB9BE),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.r),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Create',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    child: Center(
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                          Text(
-                            'Create',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: Colors.white,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w600,
-                              height: 0,
-                              letterSpacing: 0.36,
-                            ),
-                          )
-                        ]))),
+                  ),
+                ),
               ),
-              SizedBox(
-                height: 20.h,
-              )
+              SizedBox(height: 20.h),
             ],
           ),
         ),

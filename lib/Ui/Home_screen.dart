@@ -3,13 +3,15 @@ import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:pocket_recipes/Provider/Receipe_model.dart';
+import 'package:pocket_recipes/Provider/Recipe_provider.dart';
 import 'package:pocket_recipes/Ui/Add_recipe_screen.dart';
 import 'package:pocket_recipes/Ui/Recipe_details_screen.dart';
 import 'package:pocket_recipes/Ui/favourate_page.dart';
 import 'package:pocket_recipes/widget/custom_page_route.dart';
-
+import 'package:provider/provider.dart';
+bool fileExists(String path) {
+  return File(path).existsSync();
+}
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -19,24 +21,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final Box<Recipe> recipeBox = Hive.box<Recipe>('recipes');
-  List<Recipe> filteredRecipes = [];
 
   @override
   void initState() {
     super.initState();
-    // Initialize filtered list with all recipes
-    filteredRecipes = recipeBox.values.toList();
     _searchController.addListener(_searchRecipes);
   }
 
   void _searchRecipes() {
     final query = _searchController.text.toLowerCase();
-    setState(() {
-      filteredRecipes = recipeBox.values
-          .where((recipe) => recipe.title.toLowerCase().contains(query))
-          .toList();
-    });
+    Provider.of<RecipeProvider>(context, listen: false).filterRecipes(query);
   }
 
   @override
@@ -53,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 5,
         backgroundColor: Colors.white,
         title: Text(
-          'Pocket Recipes ',
+          'Pocket Recipes',
           textAlign: TextAlign.left,
           style: GoogleFonts.sofiaSans(
             color: const Color.fromRGBO(10, 37, 51, 1),
@@ -67,14 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
             child: InkWell(
               onTap: () {
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => FavouratePage()));
+                  context,
+                  MaterialPageRoute(builder: (_) => const FavouratePage()),
+                );
               },
               child: const Icon(
                 BootstrapIcons.heart,
                 color: Colors.black,
               ),
             ),
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -88,7 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: ShapeDecoration(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 2.w, color: const Color(0xFFE6EBF2)),
+                    side:
+                        BorderSide(width: 2.w, color: const Color(0xFFE6EBF2)),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
@@ -110,24 +107,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFF97A1B0),
                     ),
-                    border: const OutlineInputBorder(borderSide: BorderSide.none),
+                    border:
+                        const OutlineInputBorder(borderSide: BorderSide.none),
                   ),
                 ),
               ),
             ),
             SizedBox(height: 10.h),
             Expanded(
-              child: ValueListenableBuilder(
-                valueListenable: recipeBox.listenable(),
-                builder: (context, Box<Recipe> box, _) {
-                  // Update filteredRecipes whenever box changes
-                  filteredRecipes = _searchController.text.isEmpty
-                      ? box.values.toList()
-                      : box.values
-                          .where((recipe) => recipe.title
-                              .toLowerCase()
-                              .contains(_searchController.text.toLowerCase()))
-                          .toList();
+              child: Consumer<RecipeProvider>(
+                builder: (context, recipeProvider, _) {
+                  final filteredRecipes = recipeProvider.filteredRecipes;
 
                   if (filteredRecipes.isEmpty) {
                     return Center(
@@ -141,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   }
+
                   return ListView.builder(
                     itemCount: filteredRecipes.length,
                     itemBuilder: (context, index) {
@@ -149,13 +140,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.symmetric(vertical: 5.h),
                         child: GestureDetector(
                           onTap: () {
-                              Navigator.of(context).push(CustomPageRoute(child: RecipeDetailsScreen(
+                            Navigator.of(context).push(
+                              CustomPageRoute(
+                                child: RecipeDetailsScreen(
                                   title: recipe.title,
                                   image: recipe.imagePath,
                                   ingredients: recipe.ingredients,
                                   description: recipe.description,
-                                ),direction: AxisDirection.up));
-                         
+                                ),
+                                direction: AxisDirection.up,
+                              ),
+                            );
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -181,8 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 100.w,
                                   height: 84.h,
                                   decoration: ShapeDecoration(
-                                    // ignore: unnecessary_null_comparison
-                                    image: recipe.imagePath != null
+                                    image: fileExists(recipe.imagePath)
                                         ? DecorationImage(
                                             image: FileImage(
                                                 File(recipe.imagePath)),
@@ -235,14 +229,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(CustomPageRoute(child: AddRecipeScreen(),direction: AxisDirection.right));
-          
+          Navigator.of(context).push(
+            CustomPageRoute(
+              child: const AddRecipeScreen(),
+              direction: AxisDirection.right,
+            ),
+          );
         },
         child: const Icon(Icons.add, color: Colors.white),
         backgroundColor: const Color(0xFF6FB9BE),

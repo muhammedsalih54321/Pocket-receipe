@@ -22,17 +22,19 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
   Recipe read(BinaryReader reader) {
     return Recipe(
       title: reader.readString(),
-      ingredients: reader.readList(),
+      ingredients: (reader.readList()).cast<String>(), // Ensure List<String>
       description: reader.readString(),
       imagePath: reader.readString(),
+      isFavorite: reader.readBool(), // Read the isFavorite field
     );
   }
 
   @override
   void write(BinaryWriter writer, Recipe obj) {
     writer.writeString(obj.title);
-    writer.writeList(obj.ingredients);
+    writer.writeList(obj.ingredients); // Write List<String>
     writer.writeString(obj.description);
     writer.writeString(obj.imagePath);
+    writer.writeBool(obj.isFavorite); // Write the isFavorite field
   }
 }

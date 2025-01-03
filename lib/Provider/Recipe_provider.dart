@@ -1,143 +1,81 @@
-// import 'dart:io';
-// import 'package:flutter/material.dart';
-// import 'package:hive/hive.dart';
-// import 'package:pocket_recipes/Provider/Receipe_model.dart';
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pocket_recipes/Provider/Receipe_model.dart';
 
-// class RecipeProvider with ChangeNotifier {
-//   // List of recipes
-//   List<Recipe> _recipes = [];
-//   File? image;
-//   String title = '';
-//   String ingredients = '';
-//   String description = '';
-//   late Box<Recipe> _recipeBox; // Store the opened Hive box
+class RecipeProvider extends ChangeNotifier {
+  late Box<Recipe> recipeBox;
 
-//   // Getter for recipes
-//   List<Recipe> get recipes => _recipes;
+  // Holds the filtered recipes
+  List<Recipe> _filteredRecipes = [];
 
-//   // Initialize the Hive box (call this method in the app initialization phase)
-//   Future<void> initializeBox() async {
-//     if (!Hive.isBoxOpen('recipes')) {
-//       _recipeBox = await Hive.openBox<Recipe>('recipes');
-//     } else {
-//       _recipeBox = Hive.box<Recipe>('recipes');
-//     }
-//     await fetchRecipes(); // Load existing recipes
-//   }
+  // Get all recipes
+  List<Recipe> get recipes => recipeBox.values.toList();
 
-//   // Load recipes from Hive
-//   Future<void> fetchRecipes() async {
-//     try {
-//       _recipes = _recipeBox.values.toList();
-//       notifyListeners();
-//     } catch (e) {
-//       debugPrint("Error fetching recipes: $e");
-//     }
-//   }
+  // Get favorite recipes
+  List<Recipe> get favorites =>
+      recipes.where((recipe) => recipe.isFavorite).toList();
 
-//   // Save a new recipe
-//   Future<void> saveRecipe() async {
-//     try {
-//       if (title.isEmpty || ingredients.isEmpty || description.isEmpty || image == null) {
-//         throw Exception("All fields are required!");
-//       }
+  // Get filtered recipes
+  List<Recipe> get filteredRecipes => _filteredRecipes.isEmpty
+      ? recipes // If no filter is applied, return all recipes
+      : _filteredRecipes;
 
-//       final recipe = Recipe(
-//         id: DateTime.now().toString(),
-//         imagePath: image!.path,
-//         title: title,
-//         ingredients: ingredients,
-//         description: description,
-//       );
+  // Initialize the box in initState
+  Future<void> init() async {
+    recipeBox = await Hive.openBox<Recipe>('recipes');
+    notifyListeners();
+  }
 
-//       await _recipeBox.add(recipe); // Add to Hive box
+  // Add a new recipe
+  void addRecipe(Recipe recipe) {
+    recipeBox.put(recipe.title, recipe);
+    notifyListeners();
+  }
 
-//       // Update the local list
-//       _recipes.add(recipe);
+  // Toggle favorite status
+ void toggleFavorite({
+  required String title,
+  required String description,
+  required String imagePath,
+  required List<dynamic> ingredients,
+}) {
+  final existingRecipe = recipeBox.get(title);
 
-//       // Reset fields after saving
-//       clearFields();
+  if (existingRecipe != null) {
+    // Toggle the favorite status (set isFavorite to false if true, and vice versa)
+    existingRecipe.isFavorite = !existingRecipe.isFavorite;
+    recipeBox.put(title, existingRecipe);  // Update the recipe in the box
+  } else {
+    // Add the recipe as a favorite if it doesn't exist
+    final newRecipe = Recipe(
+      title: title,
+      description: description,
+      imagePath: imagePath,
+      ingredients: ingredients,
+      isFavorite: true, // Add as favorite initially
+    );
+    recipeBox.put(title, newRecipe); // Save the new favorite recipe
+  }
 
-//       notifyListeners();
-//     } catch (e) {
-//       debugPrint("Error saving recipe: $e");
-//     }
-//   }
+  // Notify listeners to update the UI
+  notifyListeners();
+}
 
-//   // Remove a recipe
-//   Future<void> deleteRecipe(String id) async {
-//     try {
-//       final key = _findKeyById(id);
-//       if (key != null) {
-//         await _recipeBox.delete(key); // Remove from Hive box
-//         _recipes.removeWhere((recipe) => recipe.id == id); // Update local list
-//         notifyListeners();
-//       } else {
-//         debugPrint("Recipe with id $id not found!");
-//       }
-//     } catch (e) {
-//       debugPrint("Error deleting recipe: $e");
-//     }
-//   }
+  // Remove a recipe
+  void removeRecipe(String title) {
+    recipeBox.delete(title);
+    notifyListeners();
+  }
 
-//   // Update a recipe
-//   Future<void> updateRecipe(String id, Recipe updatedRecipe) async {
-//     try {
-//       final key = _findKeyById(id);
-//       if (key != null) {
-//         await _recipeBox.put(key, updatedRecipe); // Update Hive box
-
-//         // Update the local list
-//         final index = _recipes.indexWhere((recipe) => recipe.id == id);
-//         if (index != -1) {
-//           _recipes[index] = updatedRecipe;
-//           notifyListeners();
-//         }
-//       } else {
-//         debugPrint("Recipe with id $id not found!");
-//       }
-//     } catch (e) {
-//       debugPrint("Error updating recipe: $e");
-//     }
-//   }
-
-//   // Helper methods to update fields
-//   void setImage(File? newImage) {
-//     image = newImage;
-//     notifyListeners();
-//   }
-
-//   void setTitle(String newTitle) {
-//     title = newTitle;
-//     notifyListeners();
-//   }
-
-//   void setIngredients(String newIngredients) {
-//     ingredients = newIngredients;
-//     notifyListeners();
-//   }
-
-//   void setDescription(String newDescription) {
-//     description = newDescription;
-//     notifyListeners();
-//   }
-
-//   void clearFields() {
-//     image = null;
-//     title = '';
-//     ingredients = '';
-//     description = '';
-//     notifyListeners();
-//   }
-
-//   // Helper method to find a Hive key by recipe id
-//   dynamic _findKeyById(String id) {
-//     return _recipeBox.keys.firstWhere(
-//       (key) {
-//         final recipe = _recipeBox.get(key);
-//         return recipe?.id == id;
-//       },
-//       orElse: () => null,
-//     );
-//   }
-// }
+  // Filter recipes based on a search query
+  void filterRecipes(String query) {
+    if (query.isEmpty) {
+      _filteredRecipes = [];
+    } else {
+      _filteredRecipes = recipes
+          .where((recipe) => recipe.title.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    notifyListeners();
+  }
+}

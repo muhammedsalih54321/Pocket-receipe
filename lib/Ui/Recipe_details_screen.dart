@@ -1,12 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pocket_recipes/Provider/Recipe_provider.dart';
+import 'package:provider/provider.dart';
 
-class RecipeDetailsScreen extends StatefulWidget {
+class RecipeDetailsScreen extends StatelessWidget {
   final String title;
   final String image;
   final List<dynamic> ingredients;
@@ -21,50 +21,11 @@ class RecipeDetailsScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<RecipeDetailsScreen> createState() => _RecipeDetailsScreenState();
-}
-
-class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
-  late Box<Map<String, dynamic>> favoriteBox;
-  bool isFavorite = false;
-
- @override
-void initState() {
-  super.initState();
-
-  // Access the already opened box
-  favoriteBox = Hive.box<Map<String, dynamic>>('favorite');
-  isFavorite = favoriteBox.containsKey(widget.title);
-}
-
-
-  void checkIfFavorite() {
-    setState(() {
-      isFavorite = favoriteBox.containsKey(widget.title);
-    });
-  }
-
- void toggleFavorite() {
-  if (isFavorite) {
-    // Remove from favorites
-    favoriteBox.delete(widget.title);
-  } else {
-    // Add to favorites with proper type
-    favoriteBox.put(widget.title, {
-      'title': widget.title,
-      'image': widget.image,
-      'ingredients': widget.ingredients,
-      'description': widget.description,
-    });
-  }
-  setState(() {
-    isFavorite = !isFavorite;
-  });
-}
-
-
-  @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context);
+    final isFavorite = recipeProvider.favorites
+        .any((recipe) => recipe.title == title); // Check favorite status
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -80,7 +41,7 @@ void initState() {
                 height: 230.h,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: FileImage(File(widget.image)),
+                    image: FileImage(File(image)),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(18.r),
@@ -112,7 +73,14 @@ void initState() {
                           ),
                         ),
                         GestureDetector(
-                          onTap: toggleFavorite,
+                          onTap: () {
+                            recipeProvider.toggleFavorite(
+                              description: description,
+                              imagePath: image,
+                              ingredients: ingredients, 
+                              title: title,
+                            );
+                          },
                           child: Container(
                             width: 40.w,
                             height: 40.h,
@@ -126,13 +94,14 @@ void initState() {
                                 ),
                               ],
                             ),
-                            child:isFavorite ? Icon(
-                              BootstrapIcons.heart_fill,
-                              color:Color(0xFF6FB9BE),
-                            ):Icon(
-                              BootstrapIcons.heart,
-                              color:Colors.black87,
-                            )
+                            child: Icon(
+                              isFavorite
+                                  ? BootstrapIcons.heart_fill
+                                  : BootstrapIcons.heart,
+                              color: isFavorite
+                                  ? const Color(0xFF6FB9BE)
+                                  : Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -142,7 +111,7 @@ void initState() {
               ),
               SizedBox(height: 20.h),
               Text(
-                widget.title,
+                title,
                 style: GoogleFonts.sofiaSans(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
@@ -153,21 +122,22 @@ void initState() {
               Wrap(
                 spacing: 5.w,
                 runSpacing: 10.h,
-                children: widget.ingredients.map((ingredient) {
+                children: ingredients.map((ingredient) {
                   return Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 10.w,
                       vertical: 5.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: const Color(0xFFE6EBF2),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
                       ingredient,
                       style: GoogleFonts.mulish(
                         fontSize: 14.sp,
-                        color: Colors.black87,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   );
@@ -175,7 +145,7 @@ void initState() {
               ),
               SizedBox(height: 20.h),
               Text(
-                widget.description,
+                description,
                 style: GoogleFonts.sofiaSans(
                   fontSize: 16.sp,
                   color: Colors.grey[700],

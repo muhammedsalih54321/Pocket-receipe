@@ -1,24 +1,29 @@
 import 'package:hive/hive.dart';
-// Required for code generation
 
-@HiveType(typeId: 0) // Assign a unique typeId for this model
+
+@HiveType(typeId: 0)
 class Recipe {
   @HiveField(0)
   final String title;
 
   @HiveField(1)
-  final List ingredients;
-
-  @HiveField(2)
   final String description;
 
-  @HiveField(3)
+  @HiveField(2)
   final String imagePath;
+
+  @HiveField(3)
+  final List<dynamic> ingredients;
+
+  // Ensure that `isFavorite` is initialized properly
+  @HiveField(4)
+  bool isFavorite;
 
   Recipe({
     required this.title,
-    required this.ingredients,
     required this.description,
     required this.imagePath,
+    required this.ingredients,
+    this.isFavorite = false, // Provide a default value for `isFavorite`
   });
 }
