@@ -168,11 +168,14 @@ class FavouratePage extends StatelessWidget {
                           thickness: 0.3,
                         ),
                         GestureDetector(
+                            onTap: () {
+                            recipeProvider.removeFromFavorites(recipe.title);
+                            },
                             child: Icon(
-                          BootstrapIcons.trash3,
-                          size: 20,
-                          color: Colors.red,
-                        ))
+                              BootstrapIcons.trash3,
+                              size: 20,
+                              color: Colors.red,
+                            ))
                       ],
                     ),
                   ),

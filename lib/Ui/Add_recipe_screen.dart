@@ -145,15 +145,18 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   hintText: 'Title',
@@ -194,15 +197,18 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   hintText: 'Ingredients',
@@ -250,7 +256,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ],
               ),
               TextFormField(
-                maxLines: 5,
+                maxLines: 10,
                 minLines: 3,
                 controller: _descriptionController,
                 style: TextStyle(color: Colors.black),
@@ -258,15 +264,18 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   filled: true,
                   fillColor: Color(0xFFF3F3F3),
                   errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                    borderSide:
+                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   hintText: 'Description',
@@ -292,22 +301,27 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       _image == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content:
-                              Text("Please fill all fields and select an image!")),
+                          content: Text(
+                              "Please fill all fields and select an image!")),
                     );
                     return;
                   }
+                  print('Title: ${_titleController.text}');
+                  print('Ingredients: $_ingredients');
+                  print('Description: ${_descriptionController.text}');
+                  print('Image Path: ${_image!.path}');
 
-                     final newRecipe = Recipe(
+                  final newRecipe = Recipe(
                     title: _titleController.text,
                     description: _descriptionController.text,
-                    imagePath: _image!.path, // Make sure to pass the path of the image
-                    ingredients: _ingredients,
+                    imagePath: _image!.path,
+                    ingredients: List.from(_ingredients),
                     isFavorite: false,
                   );
 
                   // Add recipe to provider
-                  await recipeProvider..addRecipe(newRecipe);
+                  await recipeProvider
+                    ..addRecipe(newRecipe);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Recipe added successfully!")),
                   );

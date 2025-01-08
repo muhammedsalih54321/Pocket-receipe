@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: RecipeDetailsScreen(
                                   title: recipe.title,
                                   image: recipe.imagePath,
-                                  ingredients: recipe.ingredients,
+                                   ingredients: recipe.ingredients,
                                   description: recipe.description,
                                 ),
                                 direction: AxisDirection.up,
@@ -203,20 +203,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8.w),
-                                Container(
-                                  width: 24.w,
-                                  height: 24.h,
-                                  decoration: ShapeDecoration(
-                                    color: const Color(0xFF032628),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.r),
+                                GestureDetector(onTap: () {
+                                   recipeProvider.removeRecipe(recipe.title);
+                                },
+                                  child: Container(
+                                    width: 24.w,
+                                    height: 24.h,
+                                    decoration: ShapeDecoration(
+                                      color: const Color(0xFF032628),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                      ),
                                     ),
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      BootstrapIcons.arrow_right,
-                                      color: Colors.white,
-                                      size: 15.sp,
+                                    child: Center(
+                                      child: Icon(
+                                        BootstrapIcons.arrow_right,
+                                        color: Colors.white,
+                                        size: 15.sp,
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -78,4 +78,13 @@ class RecipeProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+  // Remove a recipe
+void removeFromFavorites(String title) {
+  final recipe = recipeBox.get(title);
+  if (recipe != null) {
+    recipe.isFavorite = false; // Unmark as favorite
+    recipeBox.put(title, recipe); // Update the recipe in the database
+    notifyListeners();
+  }
+}
 }
