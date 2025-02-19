@@ -74,7 +74,7 @@ class FavouratePage extends StatelessWidget {
                                 title: recipe.title,
                                 image: recipe.imagePath,
                                 ingredients: recipe.ingredients,
-                                description: recipe.description)));
+                                description: recipe.Instructions)));
                   },
                   child: Container(
                     padding: EdgeInsets.all(10),

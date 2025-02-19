@@ -7,7 +7,7 @@ class Recipe {
   final String title;
 
   @HiveField(1)
-  final String description;
+  final String Instructions;
 
   @HiveField(2)
   final String imagePath;
@@ -21,7 +21,7 @@ class Recipe {
 
   Recipe({
     required this.title,
-    required this.description,
+    required this.Instructions,
     required this.imagePath,
     required this.ingredients,
     this.isFavorite = false, // Provide a default value for `isFavorite`

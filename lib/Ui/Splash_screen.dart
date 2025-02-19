@@ -29,14 +29,17 @@ class _SplashScreenState extends State<SplashScreen> {
             height: 550.h,
           ),
           Center(
-            child: Text(
-              textAlign: TextAlign.center,
-              'Help to keep your recipes with happiness',
-              style: GoogleFonts.sofiaSans(
-                color: Colors.white,
-                fontSize: 28.sp,
-                fontWeight: FontWeight.w800,
-                height: 1.30.h,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                textAlign: TextAlign.center,
+                'Help to keep your recipes with happiness',
+                style: GoogleFonts.sofiaSans(
+                  color: Colors.white,
+                  fontSize: 28.sp,
+                  fontWeight: FontWeight.w800,
+                  height: 1.30.h,
+                ),
               ),
             ),
           ),
@@ -72,13 +75,13 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ),
           SizedBox(
-            height: 50.h,
+            height: 80.h,
           ),
           Text(
             'Created By Salih ',
             style: GoogleFonts.sofiaSans(
               color: Colors.black,
-              fontSize: 17.sp,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w600,
             ),
           ),

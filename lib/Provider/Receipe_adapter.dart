@@ -23,7 +23,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
     return Recipe(
       title: reader.readString(),
       ingredients: (reader.readList()).cast<String>(), // Ensure List<String>
-      description: reader.readString(),
+      Instructions: reader.readString(),
       imagePath: reader.readString(),
       isFavorite: reader.readBool(), // Read the isFavorite field
     );
@@ -33,7 +33,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
   void write(BinaryWriter writer, Recipe obj) {
     writer.writeString(obj.title);
     writer.writeList(obj.ingredients); // Write List<String>
-    writer.writeString(obj.description);
+    writer.writeString(obj.Instructions);
     writer.writeString(obj.imagePath);
     writer.writeBool(obj.isFavorite); // Write the isFavorite field
   }

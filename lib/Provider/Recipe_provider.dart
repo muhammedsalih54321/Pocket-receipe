@@ -35,7 +35,7 @@ class RecipeProvider extends ChangeNotifier {
   // Toggle favorite status
  void toggleFavorite({
   required String title,
-  required String description,
+  required String Instructions,
   required String imagePath,
   required List<dynamic> ingredients,
 }) {
@@ -49,7 +49,7 @@ class RecipeProvider extends ChangeNotifier {
     // Add the recipe as a favorite if it doesn't exist
     final newRecipe = Recipe(
       title: title,
-      description: description,
+      Instructions: Instructions,
       imagePath: imagePath,
       ingredients: ingredients,
       isFavorite: true, // Add as favorite initially

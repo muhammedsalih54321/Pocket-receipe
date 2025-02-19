@@ -27,7 +27,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   final _titleController = TextEditingController();
   final _ingredientController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _InstructionsController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _image;
   final List<String> _ingredients = [];
@@ -100,6 +100,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+         
               Container(
                 width: double.infinity,
                 height: 200.h,
@@ -115,9 +116,21 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
                 child: _image == null
                     ? Center(
-                        child: IconButton(
-                          icon: Icon(BootstrapIcons.image, size: 80.sp),
-                          onPressed: _getImage,
+                        child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(BootstrapIcons.image, size: 80.sp),
+                              onPressed: _getImage,
+                            ),
+                            Text(
+                      'Add Cover Photo',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Color(0xFF3D5480),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                          ],
                         ),
                       )
                     : IconButton(
@@ -129,7 +142,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               Row(
                 children: [
                   Text(
-                    'Title',
+                    'Food Name',
                     style: GoogleFonts.sofiaSans(
                       color: Color(0xFF0A2533),
                       fontSize: 15.sp,
@@ -159,7 +172,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
-                  hintText: 'Title',
+                  hintText: 'Food Name',
                   hintStyle: GoogleFonts.poppins(
                     color: Color(0xFF7C7C7C),
                     fontSize: 16.sp,
@@ -168,7 +181,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Enter the title!';
+                    return 'Enter the Food Name!';
                   }
                   return null;
                 },
@@ -246,7 +259,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               Row(
                 children: [
                   Text(
-                    'Description',
+                    'Instructions',
                     style: GoogleFonts.sofiaSans(
                       color: Color(0xFF0A2533),
                       fontSize: 15.sp,
@@ -257,8 +270,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               ),
               TextFormField(
                 maxLines: 10,
-                minLines: 3,
-                controller: _descriptionController,
+                minLines: 5,
+                controller: _InstructionsController,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   filled: true,
@@ -278,7 +291,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
-                  hintText: 'Description',
+                  hintText: 'Instructions',
                   hintStyle: GoogleFonts.poppins(
                     color: Color(0xFF7C7C7C),
                     fontSize: 16.sp,
@@ -287,7 +300,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Enter the description!';
+                    return 'Enter the Instructions!';
                   }
                   return null;
                 },
@@ -297,7 +310,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 onTap: () async {
                   if (_titleController.text.isEmpty ||
                       _ingredients.isEmpty ||
-                      _descriptionController.text.isEmpty ||
+                      _InstructionsController.text.isEmpty ||
                       _image == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -306,14 +319,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     );
                     return;
                   }
-                  print('Title: ${_titleController.text}');
-                  print('Ingredients: $_ingredients');
-                  print('Description: ${_descriptionController.text}');
-                  print('Image Path: ${_image!.path}');
-
-                  final newRecipe = Recipe(
+                 final newRecipe = Recipe(
                     title: _titleController.text,
-                    description: _descriptionController.text,
+                    Instructions: _InstructionsController.text,
                     imagePath: _image!.path,
                     ingredients: List.from(_ingredients),
                     isFavorite: false,
@@ -328,7 +336,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
                   _titleController.clear();
                   _ingredientController.clear();
-                  _descriptionController.clear();
+                  _InstructionsController.clear();
                   setState(() {
                     _ingredients.clear();
                     _image = null;

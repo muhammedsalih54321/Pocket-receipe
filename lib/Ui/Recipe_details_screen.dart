@@ -75,7 +75,7 @@ class RecipeDetailsScreen extends StatelessWidget {
                         GestureDetector(
                           onTap: () {
                             recipeProvider.toggleFavorite(
-                              description: description,
+                              Instructions: description,
                               imagePath: image,
                               ingredients: ingredients, 
                               title: title,

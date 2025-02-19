@@ -7,7 +7,6 @@ import 'package:pocket_recipes/Provider/Recipe_provider.dart';
 import 'package:pocket_recipes/Ui/Add_recipe_screen.dart';
 import 'package:pocket_recipes/Ui/Recipe_details_screen.dart';
 import 'package:pocket_recipes/Ui/favourate_page.dart';
-import 'package:pocket_recipes/widget/custom_page_route.dart';
 import 'package:provider/provider.dart';
 bool fileExists(String path) {
   return File(path).existsSync();
@@ -141,15 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(
-                              CustomPageRoute(
-                                child: RecipeDetailsScreen(
+                             MaterialPageRoute(builder: (_)=> RecipeDetailsScreen(
                                   title: recipe.title,
                                   image: recipe.imagePath,
                                    ingredients: recipe.ingredients,
-                                  description: recipe.description,
-                                ),
-                                direction: AxisDirection.up,
-                              ),
+                                  description: recipe.Instructions,
+                                ),)
                             );
                           },
                           child: Container(
@@ -240,10 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
-            CustomPageRoute(
-              child: const AddRecipeScreen(),
-              direction: AxisDirection.right,
-            ),
+            MaterialPageRoute(builder: (_)=>AddRecipeScreen())
           );
         },
         child: const Icon(Icons.add, color: Colors.white),
