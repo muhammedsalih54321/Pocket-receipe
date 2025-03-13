@@ -15,7 +15,7 @@ class FavouratePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFF88C3C6),
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
@@ -23,13 +23,13 @@ class FavouratePage extends StatelessWidget {
           },
           child: Icon(
             BootstrapIcons.chevron_left,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         title: Text(
           'My Favorite',
           style: GoogleFonts.sofiaSans(
-            color: const Color(0xFF0A2533),
+            color: Colors.white,
             fontSize: 25.sp,
             fontWeight: FontWeight.w700,
           ),
@@ -58,7 +58,7 @@ class FavouratePage extends StatelessWidget {
               itemCount: favoriteRecipes.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 340 / 400,
+                childAspectRatio: 310 / 400,
                 crossAxisSpacing: 16.w,
                 mainAxisSpacing: 16.h,
               ),
@@ -74,109 +74,113 @@ class FavouratePage extends StatelessWidget {
                                 title: recipe.title,
                                 image: recipe.imagePath,
                                 ingredients: recipe.ingredients,
-                                description: recipe.Instructions)));
+                                description: recipe.Instructions,
+                                 Quantity: recipe.Quantity,)));
                   },
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    width: 156.w,
-                    height: 198.h,
-                    decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                            width: 1, color: const Color(0xFFFAFAFA)),
-                        borderRadius: BorderRadius.circular(16.r),
+                  child: Card(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: 156.w,
+                     
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              width: 1.w, color: const Color(0xFFFAFAFA)),
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        shadows: [
+                          BoxShadow(
+                            color: const Color(0x19053336),
+                            blurRadius: 16.r,
+                            offset: const Offset(0, 2),
+                            spreadRadius: 0,
+                          )
+                        ],
                       ),
-                      shadows: [
-                        BoxShadow(
-                          color: const Color(0x19053336),
-                          blurRadius: 16.r,
-                          offset: const Offset(0, 2),
-                          spreadRadius: 0,
-                        )
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          width: 132.w,
-                          height: 88.h,
-                          decoration: ShapeDecoration(
-                            image: recipe.imagePath.isNotEmpty
-                                ? DecorationImage(
-                                    image: FileImage(File(recipe.imagePath)),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                            color: const Color(0xFFC4C4C4),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16.r),
-                            ),
-                          ),
-                          child: Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                              width: 28.w,
-                              height: 28.h,
-                              decoration: ShapeDecoration(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                shadows: [
-                                  BoxShadow(
-                                    color: const Color(0x19053336),
-                                    blurRadius: 16.r,
-                                    offset: const Offset(0, 2),
-                                    spreadRadius: 0,
-                                  )
-                                ],
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            width: 132.w,
+                            height: 88.h,
+                            decoration: ShapeDecoration(
+                              image: recipe.imagePath.isNotEmpty
+                                  ? DecorationImage(
+                                      image: FileImage(File(recipe.imagePath)),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                              color: const Color(0xFFC4C4C4),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.r),
                               ),
-                              child: Center(
-                                child: Icon(
-                                  BootstrapIcons.heart_fill,
-                                  color: const Color(0xFF6FB9BE),
-                                  size: 15.sp,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                width: 28.w,
+                                height: 28.h,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  shadows: [
+                                    BoxShadow(
+                                      color: const Color(0x19053336),
+                                      blurRadius: 16.r,
+                                      offset: const Offset(0, 2),
+                                      spreadRadius: 0,
+                                    )
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    BootstrapIcons.heart_fill,
+                                    color: const Color(0xFF6FB9BE),
+                                    size: 15.sp,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 12.h,
-                        ),
-                        SizedBox(
-                          width: 132.w,
-                          child: Text(
-                            recipe.title,
-                            style: GoogleFonts.sofiaSans(
-                              color: const Color(0xFF0A2533),
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                              height: 1.35.h,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          SizedBox(
+                            height: 12.h,
                           ),
-                        ),
-                        SizedBox(
-                          height: 20.h,
-                        ),
-                        Divider(
-                          color: Colors.black,
-                          thickness: 0.3,
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                            recipeProvider.removeFromFavorites(recipe.title);
-                            },
-                            child: Icon(
-                              BootstrapIcons.trash3,
-                              size: 20,
-                              color: Colors.red,
-                            ))
-                      ],
+                          SizedBox(
+                            width: 132.w,
+                            height: 40.h,
+                            child: Text(
+                              recipe.title,
+                              style: GoogleFonts.sofiaSans(
+                                color: const Color(0xFF0A2533),
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w700,
+                                height: 1.35.h,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.h,
+                          ),
+                          Divider(
+                            color: Colors.black,
+                            thickness: 0.3,
+                          ),
+                          GestureDetector(
+                              onTap: () {
+                              recipeProvider.removeFromFavorites(recipe.title);
+                              },
+                              child: Icon(
+                                BootstrapIcons.trash3,
+                                size: 20,
+                                color: Colors.red,
+                              ))
+                        ],
+                      ),
                     ),
                   ),
                 );

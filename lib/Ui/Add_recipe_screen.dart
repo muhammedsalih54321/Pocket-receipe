@@ -27,10 +27,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   final _titleController = TextEditingController();
   final _ingredientController = TextEditingController();
+  final _quantityController = TextEditingController();
   final _InstructionsController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _image;
   final List<String> _ingredients = [];
+  final List<String> _quantities = [];
 
   Future<void> _getImage() async {
     final pickedFile =
@@ -48,14 +50,20 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   void _addIngredient() {
     final ingredient = _ingredientController.text.trim();
-    if (ingredient.isNotEmpty && !_ingredients.contains(ingredient)) {
+    final Quantity = _quantityController.text.trim();
+    if (ingredient.isNotEmpty &&
+        !_ingredients.contains(ingredient) &&
+        Quantity.isNotEmpty) {
       setState(() {
         _ingredients.add(ingredient);
         _ingredientController.clear();
+        _quantities.add(Quantity);
+        _quantityController.clear();
       });
-    } else if (ingredient.isEmpty) {
+    } else if (ingredient.isEmpty || Quantity.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an ingredient!')),
+        const SnackBar(
+            content: Text('You forgot to enter ingredients or Quantity!')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -88,10 +96,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         ),
         title: Text(
           'Add Recipe',
-          style: GoogleFonts.sofiaSans(
+          style: GoogleFonts.poppins(
             color: Color(0xFF0A2533),
             fontSize: 25.sp,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -100,7 +108,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-         
               Container(
                 width: double.infinity,
                 height: 200.h,
@@ -116,20 +123,21 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
                 child: _image == null
                     ? Center(
-                        child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
                               icon: Icon(BootstrapIcons.image, size: 80.sp),
                               onPressed: _getImage,
                             ),
                             Text(
-                      'Add Cover Photo',
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Color(0xFF3D5480),
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                              'Add Cover Photo',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color(0xFF3D5480),
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ],
                         ),
                       )
@@ -199,54 +207,105 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ],
               ),
-              TextFormField(
-                controller: _ingredientController,
-                style: TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _ingredientController,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFFF3F3F3),
+                        errorBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        hintText: 'Ingredients',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Color(0xFF7C7C7C),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _quantityController,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFFF3F3F3),
+                        errorBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        hintText: 'Quantity',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Color(0xFF7C7C7C),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  IconButton(
+                    onPressed: () {
+                      _addIngredient();
+                    },
                     icon: Icon(Icons.add),
-                    onPressed: _addIngredient,
                   ),
-                  filled: true,
-                  fillColor: Color(0xFFF3F3F3),
-                  errorBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(width: 1.w, color: Color(0xFFA8A8A9)),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  hintText: 'Ingredients',
-                  hintStyle: GoogleFonts.poppins(
-                    color: Color(0xFF7C7C7C),
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                onFieldSubmitted: (value) => _addIngredient(),
+                ],
               ),
               SizedBox(height: 20.h),
               ...List.generate(
                 _ingredients.length,
                 (index) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    padding: EdgeInsets.symmetric(vertical: 4.h),
                     child: Card(
                       child: ListTile(
-                        title: Text(_ingredients[index]),
+                        title: Text(
+                          _ingredients[index],
+                          style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: Text(_quantities[index], style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500),),
                         trailing: IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(BootstrapIcons.trash3, color: Colors.red,size: 20.sp,),
                           onPressed: () {
                             setState(() {
                               _ingredients.removeAt(index);
+                              _quantities.removeAt(index);
                             });
                           },
                         ),
@@ -269,7 +328,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ],
               ),
               TextFormField(
-                maxLines: 10,
+                textInputAction: TextInputAction.done,
+                maxLines: null,
                 minLines: 5,
                 controller: _InstructionsController,
                 style: TextStyle(color: Colors.black),
@@ -319,12 +379,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     );
                     return;
                   }
-                 final newRecipe = Recipe(
+                  final newRecipe = Recipe(
                     title: _titleController.text,
                     Instructions: _InstructionsController.text,
                     imagePath: _image!.path,
                     ingredients: List.from(_ingredients),
                     isFavorite: false,
+                    Quantity: List.from(_quantities),
                   );
 
                   // Add recipe to provider
@@ -346,7 +407,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 child: Container(
                   width: 316.w,
                   height: 57.h,
-                  padding: const EdgeInsets.symmetric(vertical: 17),
+                  padding: EdgeInsets.symmetric(vertical: 17.h),
                   decoration: ShapeDecoration(
                     color: Color(0xFF6FB9BE),
                     shape: RoundedRectangleBorder(

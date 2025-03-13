@@ -38,6 +38,7 @@ class RecipeProvider extends ChangeNotifier {
   required String Instructions,
   required String imagePath,
   required List<dynamic> ingredients,
+  required List<dynamic> Quantity,
 }) {
   final existingRecipe = recipeBox.get(title);
 
@@ -52,7 +53,8 @@ class RecipeProvider extends ChangeNotifier {
       Instructions: Instructions,
       imagePath: imagePath,
       ingredients: ingredients,
-      isFavorite: true, // Add as favorite initially
+      isFavorite: true,
+      Quantity: Quantity, // Add as favorite initially
     );
     recipeBox.put(title, newRecipe); // Save the new favorite recipe
   }

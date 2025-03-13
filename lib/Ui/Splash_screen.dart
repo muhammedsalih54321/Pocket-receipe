@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ),
           SizedBox(
-            height: 30.h,
+            height: 70.h,
           ),
           GestureDetector(
             onTap: () {
@@ -75,16 +75,9 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ),
           SizedBox(
-            height: 80.h,
+            height: 50.h,
           ),
-          Text(
-            'Created By Salih ',
-            style: GoogleFonts.sofiaSans(
-              color: Colors.black,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+         
         ],
       ),
     ));

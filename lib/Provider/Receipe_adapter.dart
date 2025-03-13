@@ -25,7 +25,8 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
       ingredients: (reader.readList()).cast<String>(), // Ensure List<String>
       Instructions: reader.readString(),
       imagePath: reader.readString(),
-      isFavorite: reader.readBool(), // Read the isFavorite field
+      isFavorite: reader.readBool(),
+       Quantity:(reader.readList()).cast<String>(), // Read the isFavorite field
     );
   }
 
@@ -36,5 +37,6 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
     writer.writeString(obj.Instructions);
     writer.writeString(obj.imagePath);
     writer.writeBool(obj.isFavorite); // Write the isFavorite field
+    writer.writeList(obj.Quantity);
   }
 }

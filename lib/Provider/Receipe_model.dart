@@ -19,7 +19,11 @@ class Recipe {
   @HiveField(4)
   bool isFavorite;
 
-  Recipe({
+  @HiveField(5)
+  final List<dynamic> Quantity;
+
+  Recipe( {
+    required this.Quantity,
     required this.title,
     required this.Instructions,
     required this.imagePath,
